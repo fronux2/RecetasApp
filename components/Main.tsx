@@ -1,9 +1,8 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { View } from 'react-native';
 import Hero from './Hero';
-import ListCards from './ListCards';
+import ListCards2 from './ListCards2';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native';
-import { Link } from 'expo-router';
 
 export default function Main() {
   const insets = useSafeAreaInsets();
@@ -14,9 +13,9 @@ export default function Main() {
     >
       <ScrollView>
         <Hero />
-        <ListCards title="Almuerzo" />
-        <ListCards title="Postre" />
-        <ListCards title="Bebidas" />
+        <ListCards2 title="Almuerzo" />
+        <ListCards2 title="Postre" />
+        <ListCards2 title="Bebidas" />
       </ScrollView>
     </View>
   );
