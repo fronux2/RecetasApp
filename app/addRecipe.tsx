@@ -11,7 +11,7 @@ import {
 import { type Recipe } from '../types/models';
 import { Picker } from '@react-native-picker/picker';
 import { pickImage, takePhoto } from '../utils/imageUtils';
-import { uploadRecipeImage } from '../utils/uploadImage'; // Importación correcta de las funciones
+import { uploadRecipeImage } from '../services/uploadImage'; // Importación correcta de las funciones
 import { addRecipe } from '../services/supabaseService';
 const { supabase } = require('../supabase/supabaseCliente');
 export default function RecipeForm() {
@@ -20,7 +20,6 @@ export default function RecipeForm() {
   const [ingredients, setIngredients] = useState('');
   const [instructions, setInstructions] = useState('');
   const [categoryId, setCategoryId] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
   const [imageUpload, setImageUpload] = useState<{
     base64: string;
     imageName: string;
@@ -80,10 +79,6 @@ export default function RecipeForm() {
       imageUpload.imageName
     );
 
-    if (uploadResponse) {
-      setImageUrl(uploadResponse);
-      console.log('Upload response: ', uploadResponse);
-    }
     if (!uploadResponse) {
       return;
     }
@@ -106,7 +101,6 @@ export default function RecipeForm() {
       setIngredients('');
       setInstructions('');
       setCategoryId('');
-      setImageUrl('');
     } catch (error) {
       console.error('Error al crear la receta:', error);
       Alert.alert('Error', 'No se pudo crear la receta.');
@@ -115,6 +109,12 @@ export default function RecipeForm() {
 
   const handlePhotoUpload = async () => {
     const result = await takePhoto();
+    if (!result) return;
+    const { base64, imageName, uri } = result;
+    setImageUpload({ base64, imageName, uri });
+  };
+  const handleImageUpload = async () => {
+    const result = await pickImage();
     if (!result) return;
     const { base64, imageName, uri } = result;
     setImageUpload({ base64, imageName, uri });
@@ -168,7 +168,10 @@ export default function RecipeForm() {
             ))}
           </Picker>
         )}
-        <Button title="Seleccionar Imagen de la Galería" />
+        <Button
+          title="Seleccionar Imagen de la Galería"
+          onPress={handleImageUpload}
+        />
         <Button title="Tomar Foto con la Cámara" onPress={handlePhotoUpload} />
         <Button title="Crear Receta" onPress={handleSubmit} color="#00bcd4" />
         {imageUpload && (

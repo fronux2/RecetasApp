@@ -1,6 +1,5 @@
 import * as ImagePicker from 'expo-image-picker';
 import { Alert } from 'react-native';
-
 import * as FileSystem from 'expo-file-system';
 // Solicitar permisos de cámara y galería
 export const requestPermissions = async () => {
@@ -22,28 +21,29 @@ export const requestPermissions = async () => {
 };
 
 // Seleccionar imagen desde la galería
-export const pickImage = async (setImage: Function, setImageUrl: Function) => {
+export const pickImage = async () => {
   const hasPermissions = await requestPermissions();
   if (!hasPermissions) return;
 
   const result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    mediaTypes: 'images',
     quality: 1,
   });
-
   if (!result.canceled) {
-    const selectedImageUri = result.assets[0].uri;
-    console.log(result.assets);
-    setImage(selectedImageUri);
+    const capturedImageUri = result.assets[0];
+    const uri = result.assets[0].uri;
+    const base64 = await FileSystem.readAsStringAsync(capturedImageUri.uri, {
+      encoding: 'base64',
+    });
 
     try {
-      const imageName = `/${Date.now()}.jpg`;
-      const file = await uriToFile(selectedImageUri, imageName); // Convertir el URI a un archivo
-      const uploadResponse = await uploadRecipeImage(file, imageName);
-
-      if (uploadResponse) {
-        setImageUrl(uploadResponse.publicUrl);
-        Alert.alert('Éxito', 'Imagen subida exitosamente.');
+      const imageName = `${Date.now()}.jpg`;
+      try {
+        const imageName = `${Date.now()}.jpg`;
+        return { base64, imageName, uri };
+      } catch (error) {
+        console.error('Error al subir la imagen:', error);
+        Alert.alert('Error', 'No se pudo subir la imagen.');
       }
     } catch (error) {
       console.error('Error al subir la imagen:', error);
