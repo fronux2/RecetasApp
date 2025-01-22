@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { supabase } from '../../supabase/supabaseCliente';
+import { HomeIcon, NoteIcon, UserIcon } from '../../utils/iconsUtils';
 export default function TabsLayout() {
   const [user, setUser] = useState<any>(null);
   useEffect(() => {
@@ -24,6 +25,7 @@ export default function TabsLayout() {
         options={{
           title: 'Home',
           headerTitle: '',
+          tabBarIcon: () => <HomeIcon />,
         }}
       />
       <Tabs.Screen
@@ -31,6 +33,7 @@ export default function TabsLayout() {
         options={{
           title: 'Perfil',
           headerTitle: '',
+          tabBarIcon: () => <UserIcon />,
         }}
       />
       <Tabs.Screen
@@ -38,6 +41,7 @@ export default function TabsLayout() {
         options={{
           title: 'Recetas',
           headerTitle: '',
+          tabBarIcon: () => <NoteIcon />,
         }}
       />
     </Tabs>

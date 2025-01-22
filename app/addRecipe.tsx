@@ -7,19 +7,23 @@ import {
   Image,
   Alert,
   ScrollView,
+  Pressable,
 } from 'react-native';
 import { type Recipe } from '../types/models';
 import { Picker } from '@react-native-picker/picker';
 import { pickImage, takePhoto } from '../utils/imageUtils';
 import { uploadRecipeImage } from '../services/uploadImage'; // Importación correcta de las funciones
 import { addRecipe } from '../services/supabaseService';
+import Spinner from 'react-native-loading-spinner-overlay';
 const { supabase } = require('../supabase/supabaseCliente');
+
 export default function RecipeForm() {
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState('');
   const [ingredients, setIngredients] = useState('');
   const [instructions, setInstructions] = useState('');
   const [categoryId, setCategoryId] = useState('');
+  const [loading, setLoading] = useState(false);
   const [imageUpload, setImageUpload] = useState<{
     base64: string;
     imageName: string;
@@ -60,6 +64,7 @@ export default function RecipeForm() {
   }, []);
 
   const handleSubmit = async () => {
+    setLoading(true);
     if (
       !title ||
       !description ||
@@ -101,6 +106,7 @@ export default function RecipeForm() {
       setIngredients('');
       setInstructions('');
       setCategoryId('');
+      setLoading(false);
     } catch (error) {
       console.error('Error al crear la receta:', error);
       Alert.alert('Error', 'No se pudo crear la receta.');
@@ -168,18 +174,38 @@ export default function RecipeForm() {
             ))}
           </Picker>
         )}
-        <Button
-          title="Seleccionar Imagen de la Galería"
-          onPress={handleImageUpload}
-        />
-        <Button title="Tomar Foto con la Cámara" onPress={handlePhotoUpload} />
-        <Button title="Crear Receta" onPress={handleSubmit} color="#00bcd4" />
+        <View className="flex-row justify-center items-center">
+          <Pressable
+            className="bg-green-500 w-44 h-16 text-white rounded-full px-4 py-2 m-2 hover:bg-green-400"
+            onPress={handleImageUpload}
+          >
+            <Text>Seleccionar Imagen</Text>
+          </Pressable>
+
+          <Pressable
+            className="bg-blue-500 w-44 h-16 text-white rounded-full px-4 py-2 m-2 hover:bg-blue-400"
+            onPress={handlePhotoUpload}
+          >
+            <Text>Tomar Foto con la Cámara</Text>
+          </Pressable>
+        </View>
+        <Pressable
+          className="bg-gray-500-500 text-white rounded-full px-4 py-2 m-2"
+          onPress={handleSubmit}
+        ></Pressable>
+
         {imageUpload && (
           <Image
             source={{ uri: imageUpload.uri }}
             style={{ width: 100, height: 100, paddingTop: 10 }}
           />
         )}
+        <Spinner
+          visible={loading}
+          textContent="Cargando..."
+          textStyle={{ color: '#FFF' }}
+          overlayColor="rgba(0, 0, 0, 0.75)" // Color del overlay
+        />
       </ScrollView>
     </View>
   );
