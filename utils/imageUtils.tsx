@@ -1,6 +1,6 @@
 import * as ImagePicker from 'expo-image-picker';
 import { Alert } from 'react-native';
-import { uploadRecipeImage } from '../utils/uploadImage';
+
 import * as FileSystem from 'expo-file-system';
 // Solicitar permisos de cámara y galería
 export const requestPermissions = async () => {
@@ -64,6 +64,7 @@ export const takePhoto = async () => {
 
   if (!result.canceled) {
     const capturedImageUri = result.assets[0];
+    const uri = result.assets[0].uri;
     const base64 = await FileSystem.readAsStringAsync(capturedImageUri.uri, {
       encoding: 'base64',
     });
@@ -71,14 +72,7 @@ export const takePhoto = async () => {
 
     try {
       const imageName = `${Date.now()}.jpg`;
-      // Convertir el URI a un archivo
-      const uploadResponse = await uploadRecipeImage(base64, imageName);
-
-      if (uploadResponse) {
-        //setImageUrl(uploadResponse.publicUrl);
-        return uploadResponse.publicUrl;
-        //Alert.alert('Éxito', 'Imagen subida exitosamente.');
-      }
+      return { base64, imageName, uri };
     } catch (error) {
       console.error('Error al subir la imagen:', error);
       Alert.alert('Error', 'No se pudo subir la imagen.');

@@ -8,19 +8,24 @@ import {
   Alert,
   ScrollView,
 } from 'react-native';
+import { type Recipe } from '../types/models';
 import { Picker } from '@react-native-picker/picker';
-import { pickImage, takePhoto } from '../utils/imageUtils'; // Importación correcta de las funciones
+import { pickImage, takePhoto } from '../utils/imageUtils';
+import { uploadRecipeImage } from '../utils/uploadImage'; // Importación correcta de las funciones
+import { addRecipe } from '../services/supabaseService';
 const { supabase } = require('../supabase/supabaseCliente');
-
 export default function RecipeForm() {
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState('');
   const [ingredients, setIngredients] = useState('');
   const [instructions, setInstructions] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [imageUrl, setImageUrl] = useState('');
-  const [cookTime, setCookTime] = useState('');
-  const [image, setImage] = useState<string | null>(null);
+  const [imageUpload, setImageUpload] = useState<{
+    base64: string;
+    imageName: string;
+    uri: string;
+  }>({ base64: '', imageName: '', uri: '' });
   const [categories, setCategories] = useState<{ id: string; name: string }[]>(
     []
   );
@@ -61,8 +66,7 @@ export default function RecipeForm() {
       !description ||
       !ingredients ||
       !instructions ||
-      !categoryId ||
-      !imageUrl
+      !categoryId
     ) {
       Alert.alert(
         'Error',
@@ -71,18 +75,31 @@ export default function RecipeForm() {
       return;
     }
 
+    const uploadResponse = await uploadRecipeImage(
+      imageUpload.base64,
+      imageUpload.imageName
+    );
+
+    if (uploadResponse) {
+      setImageUrl(uploadResponse);
+      console.log('Upload response: ', uploadResponse);
+    }
+    if (!uploadResponse) {
+      return;
+    }
+
     try {
-      const recipe = {
+      const recipe: Recipe = {
+        user_id: user.id,
         title,
         description,
         ingredients,
         instructions,
-        categoryId,
-        imageUrl,
-        cookTime: cookTime ? parseInt(cookTime, 10) : null,
+        image_url: uploadResponse,
+        category_id: categoryId,
       };
+      await addRecipe(recipe);
 
-      console.log(recipe);
       Alert.alert('Éxito', 'Receta creada con éxito');
       setTitle('');
       setDescription('');
@@ -90,12 +107,17 @@ export default function RecipeForm() {
       setInstructions('');
       setCategoryId('');
       setImageUrl('');
-      setImage(null);
-      setCookTime('');
     } catch (error) {
       console.error('Error al crear la receta:', error);
       Alert.alert('Error', 'No se pudo crear la receta.');
     }
+  };
+
+  const handlePhotoUpload = async () => {
+    const result = await takePhoto();
+    if (!result) return;
+    const { base64, imageName, uri } = result;
+    setImageUpload({ base64, imageName, uri });
   };
 
   return (
@@ -146,20 +168,12 @@ export default function RecipeForm() {
             ))}
           </Picker>
         )}
-
-        <TextInput
-          value={cookTime}
-          onChangeText={setCookTime}
-          placeholder="Tiempo de cocción (minutos)"
-          keyboardType="numeric"
-          className="w-full p-3 mb-4 border rounded-lg bg-white text-gray-700"
-        />
         <Button title="Seleccionar Imagen de la Galería" />
-        <Button title="Tomar Foto con la Cámara" />
+        <Button title="Tomar Foto con la Cámara" onPress={handlePhotoUpload} />
         <Button title="Crear Receta" onPress={handleSubmit} color="#00bcd4" />
-        {image && (
+        {imageUpload && (
           <Image
-            source={{ uri: image }}
+            source={{ uri: imageUpload.uri }}
             style={{ width: 100, height: 100, paddingTop: 10 }}
           />
         )}
