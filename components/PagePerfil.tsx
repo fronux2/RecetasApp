@@ -5,6 +5,7 @@ import { Recipe } from '../types/models';
 import { login, logout } from '../services/authService';
 import { Link } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
+import Spinner from 'react-native-loading-spinner-overlay';
 const PagePerfil = () => {
   const [user, setUser] = useState<any>(null);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
