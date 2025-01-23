@@ -4,34 +4,18 @@ import { Recipe } from '../types/models';
 import Card from './Card';
 import { ScrollView, View, Text } from 'react-native';
 import { Link } from 'expo-router';
+import { recipes } from '../data/recipe';
 interface ListCardProps {
   title: string;
+  id: string;
 }
-const ListCards: React.FC<ListCardProps> = ({ title }) => {
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [filteredRecipes, setFilteredRecipes] = useState<Recipe[]>([]); // Estado para las recetas filtradas
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  useEffect(() => {
-    const getRecipes = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchRecipes();
-        setRecipes(data);
-        setFilteredRecipes(data); // Inicialmente, todas las recetas se muestran
-      } catch (err) {
-        setError('Error al cargar las recetas.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    getRecipes();
-  }, []);
+const ListCards: React.FC<ListCardProps> = ({ title, id }) => {
+  const filter = recipes.filter((recipe) => recipe.category_id === id);
   return (
     <View className="pb-16 bg-[#fffaf0] ">
       <Text className="text-2xl font-bold mt-8 mb-2 ml-2">{title}</Text>
       <ScrollView horizontal className="ml-2">
-        {recipes.map((recipe: Recipe) => (
+        {filter.map((recipe: Recipe) => (
           <Link
             key={recipe.id}
             href={`/${recipe.id}`}

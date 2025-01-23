@@ -1,6 +1,6 @@
 import { View } from 'react-native';
 import Hero from './Hero';
-import ListCards2 from './ListCards2';
+import ListCards from './ListCards';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native';
 
@@ -13,9 +13,9 @@ export default function Main() {
     >
       <ScrollView>
         <Hero />
-        <ListCards2 title="Almuerzo" />
-        <ListCards2 title="Postre" />
-        <ListCards2 title="Bebidas" />
+        <ListCards title="Almuerzo" id="1" />
+        <ListCards title="Postre" id="2" />
+        <ListCards title="Bebidas" id="3" />
       </ScrollView>
     </View>
   );

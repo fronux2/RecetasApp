@@ -3,13 +3,14 @@ import { Text, View, Image, ActivityIndicator } from 'react-native';
 import { supabase } from '../supabase/supabaseCliente';
 import { Recipe } from '../types/models';
 import { useEffect, useState } from 'react';
-
+import { recipes } from '../data/recipe';
 export default function Recetas() {
   const { id } = useLocalSearchParams();
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
+  const filter = recipes.filter((recipe) => recipe.id === id);
+  const recipeFiltered = filter[0];
   useEffect(() => {
     const fetchRecipe = async () => {
       setLoading(true);
@@ -19,7 +20,7 @@ export default function Recetas() {
         .eq('id', id)
         .single();
       if (error) {
-        setError('No se pudo cargar la receta.');
+        setRecipe(recipeFiltered);
       } else {
         setRecipe(data);
       }
@@ -37,15 +38,13 @@ export default function Recetas() {
       </View>
     );
   }
-
-  if (error) {
+  if (recipe === null) {
     return (
       <View className="flex-1 items-center justify-center bg-gray-100 p-4">
         <Text className="text-red-600 text-lg font-semibold">{error}</Text>
       </View>
     );
   }
-
   return (
     <View className="flex-1 bg-gray-100 p-4">
       <View className="items-center mb-6">
