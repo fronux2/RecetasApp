@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../../supabase/supabaseCliente';
+import { supabase } from '../supabase/supabaseCliente';
 import {
   View,
   Text,
@@ -8,9 +8,9 @@ import {
   Alert,
   TouchableOpacity,
 } from 'react-native';
-import { login } from '../../services/authService'; // Importamos la función de login
+import { login } from '../services/authService'; // Importamos la función de login
 import { useNavigation } from '@react-navigation/native'; // Para redirigir al usuario después de login
-import { logout } from '../../services/authService';
+import { logout } from '../services/authService';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
