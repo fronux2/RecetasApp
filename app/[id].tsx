@@ -58,12 +58,15 @@ export default function Recetas() {
       </View>
 
       <View className="space-y-4">
+        <Text className="text-2xl ">{recipe.title}</Text>
         <Text className="text-lg text-gray-700">{recipe?.description}</Text>
-
         <Text className="text-base text-gray-600">
           <Text className="font-bold">Ingredientes:</Text> {recipe?.ingredients}
         </Text>
-
+        <Text className="text-base text-gray-600">
+          <Text className="font-bold">Instrucciones:</Text>{' '}
+          {recipe?.instructions}
+        </Text>
         <Text className="text-base text-gray-600">
           <Text className="font-bold">Categoría:</Text>{' '}
           {recipe?.categories?.name || 'Sin categoría'}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, Button, FlatList, TextInput } from 'react-native';
+import { View, Text, Button, FlatList, TextInput, Alert } from 'react-native';
 import { supabase } from '../supabase/supabaseCliente';
 import { Recipe } from '../types/models';
 import { login, logout } from '../services/authService';
@@ -63,10 +63,14 @@ const PagePerfil = () => {
   );
 
   const handleLogin = async () => {
-    const logged = await login(email, password);
-    if (logged) {
-      setEmail('');
-      setPassword('');
+    try {
+      const logged = await login(email, password);
+      if (logged) {
+        setEmail('');
+        setPassword('');
+      }
+    } catch (error) {
+      Alert.alert('Error', error.message || 'No se pudo iniciar sesión.');
     }
   };
 
