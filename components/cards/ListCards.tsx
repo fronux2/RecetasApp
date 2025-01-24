@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { fetchRecipes } from '../services/supabaseService';
-import { Recipe } from '../types/models';
-import Card from './Card';
+import { Recipe } from '../../types/models';
+import Card from '../cards/Card';
 import { ScrollView, View, Text } from 'react-native';
 import { Link } from 'expo-router';
-import { recipes } from '../data/recipe';
+import { recipes } from '../../data/recipe';
 interface ListCardProps {
   title: string;
   id: string;

@@ -1,6 +1,6 @@
 import { View } from 'react-native';
 import Hero from './Hero';
-import ListCards from './ListCards';
+import ListCards from './cards/ListCards';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native';
 

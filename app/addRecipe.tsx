@@ -3,7 +3,6 @@ import {
   View,
   Text,
   TextInput,
-  Button,
   Image,
   Alert,
   ScrollView,
@@ -13,7 +12,7 @@ import { type Recipe } from '../types/models';
 import { Picker } from '@react-native-picker/picker';
 import { pickImage, takePhoto } from '../utils/imageUtils';
 import { uploadRecipeImage } from '../services/uploadImage'; // Importación correcta de las funciones
-import { addRecipe } from '../services/supabaseService';
+import { addRecipe } from '../services/recipeService';
 import Spinner from 'react-native-loading-spinner-overlay';
 const { supabase } = require('../supabase/supabaseCliente');
 

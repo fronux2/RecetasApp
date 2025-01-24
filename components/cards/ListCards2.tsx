@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { fetchRecipes } from '../services/supabaseService';
-import { Recipe } from '../types/models';
-import Card from './Card';
+import { fetchRecipes } from '../../services/recipeService';
+import { Recipe } from '../../types/models';
+import Card from '../cards/Card';
 import { FlatList, View, Text, ActivityIndicator } from 'react-native';
 import { Link } from 'expo-router';
 
@@ -21,6 +21,7 @@ const ListCards2: React.FC<ListCardProps> = ({ title }) => {
         const data = await fetchRecipes();
         setRecipes(data);
       } catch (err) {
+        console.error('Error al cargar las recetas:', err);
         setError('Error al cargar las recetas.');
       } finally {
         setLoading(false);

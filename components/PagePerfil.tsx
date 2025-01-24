@@ -1,17 +1,15 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, Button, FlatList, TextInput, Alert } from 'react-native';
+import { View, Text, Button, FlatList } from 'react-native';
 import { supabase } from '../supabase/supabaseCliente';
 import { Recipe } from '../types/models';
-import { login, logout } from '../services/authService';
+import LoginForm from '../components/auth/LoginForm';
 import { Link } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
-import Spinner from 'react-native-loading-spinner-overlay';
+import { logout } from '../services/authService';
 const PagePerfil = () => {
   const [user, setUser] = useState<any>(null);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
 
   // Actualizar usuario al iniciar o cerrar sesión
   useEffect(() => {
@@ -62,18 +60,6 @@ const PagePerfil = () => {
     }, [user]) // Dependencia de "user"
   );
 
-  const handleLogin = async () => {
-    try {
-      const logged = await login(email, password);
-      if (logged) {
-        setEmail('');
-        setPassword('');
-      }
-    } catch (error) {
-      Alert.alert('Error', error.message || 'No se pudo iniciar sesión.');
-    }
-  };
-
   const handleLogout = async () => {
     await logout();
     setRecipes([]);
@@ -98,7 +84,7 @@ const PagePerfil = () => {
           ) : recipes.length > 0 ? (
             <FlatList
               data={recipes}
-              keyExtractor={(item) => item.id.toString()}
+              keyExtractor={(item: Recipe) => item.id.toString()}
               renderItem={({ item }) => (
                 <View className="p-4 bg-white mb-2 rounded-lg shadow">
                   <Text className="text-lg font-semibold text-gray-800">
@@ -128,27 +114,7 @@ const PagePerfil = () => {
           />
         </>
       ) : (
-        <View className="flex-1 justify-center items-center p-4 bg-gray-100">
-          <Text className="text-gray-600 mb-4">No estás autenticado.</Text>
-          <TextInput
-            className="w-full p-3 mb-4 border rounded-lg bg-white text-gray-700"
-            placeholder="Correo electrónico"
-            value={email}
-            onChangeText={setEmail}
-          />
-          <TextInput
-            className="w-full p-3 mb-4 border rounded-lg bg-white text-gray-700"
-            placeholder="Contraseña"
-            value={password}
-            secureTextEntry
-            onChangeText={setPassword}
-          />
-          <Button
-            title="Iniciar sesión"
-            onPress={handleLogin}
-            color="#00bcd4"
-          />
-        </View>
+        <LoginForm />
       )}
     </View>
   );
