@@ -16,6 +16,7 @@ const ListCards: React.FC<ListCardProps> = ({ title, id }) => {
         {filter.map((recipe: Recipe) => (
           <Link
             key={recipe.id}
+            testID="link-receta"
             href={`/${recipe.id}`}
             className="flex-1 p-2 m-2"
           >
