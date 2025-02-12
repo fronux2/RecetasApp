@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, Button, FlatList } from 'react-native';
+import { View, Text, Button, FlatList, Pressable } from 'react-native';
 import { supabase } from '../supabase/supabaseCliente';
 import { Recipe } from '../types/models';
 import LoginForm from '../components/auth/LoginForm';
 import { Link } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { logout } from '../services/authService';
+import { deleteRecipe } from '../services/recipeService';
 const PagePerfil = () => {
   const [user, setUser] = useState<any>(null);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -65,6 +66,20 @@ const PagePerfil = () => {
     setRecipes([]);
   };
 
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteRecipe(id);
+      setRecipes((prevRecipes) =>
+        prevRecipes.filter((recipe) => recipe.id !== id)
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleEdit = async (id: string) => {
+    console.log('handleEdit');
+  };
   return (
     <View className="flex-1 p-4 bg-gray-100">
       <Text className="text-2xl font-bold text-gray-800 mb-4">Perfil</Text>
@@ -86,13 +101,44 @@ const PagePerfil = () => {
               data={recipes}
               keyExtractor={(item: Recipe) => item.id.toString()}
               renderItem={({ item }) => (
-                <View className="p-4 bg-white mb-2 rounded-lg shadow">
-                  <Text className="text-lg font-semibold text-gray-800">
-                    {item.title}
-                  </Text>
-                  <Text className="text-sm text-gray-600">
-                    {item.description}
-                  </Text>
+                <View className="p-4 bg-gray-100 mb-2 rounded-lg shadow flex-row justify-between">
+                  <Link
+                    href={`/${item.id}`}
+                    className="w-max h-max m-1"
+                    asChild
+                  >
+                    <Pressable className="bg-gray-400 px-2 py-1  transition-opacity active:opacity-50  hover:bg-gray-300 text-center items-center justify-center">
+                      <View className="flex-col">
+                        <Text className="text-lg font-semibold text-gray-800">
+                          {item.title}
+                        </Text>
+                        <Text className="text-sm text-gray-600">
+                          {item.description}
+                        </Text>
+                      </View>
+                    </Pressable>
+                  </Link>
+
+                  <View className="flex-row">
+                    <Button
+                      title="Eliminar"
+                      color={'red'}
+                      onPress={() => handleDelete(item.id)}
+                    ></Button>
+                    <Link
+                      className="bg-slate-300 w-96"
+                      href={{
+                        pathname: `form`,
+                        params: { id: item.id },
+                      }}
+                      asChild
+                    >
+                      <Button
+                        onPress={() => handleEdit(item.id)}
+                        title="Editar"
+                      />
+                    </Link>
+                  </View>
                 </View>
               )}
             />
@@ -102,7 +148,7 @@ const PagePerfil = () => {
             </Text>
           )}
           <View className="mt-6 w-full">
-            <Link href="/addRecipe" asChild>
+            <Link href="/form" asChild>
               <Button title="Agregar receta" />
             </Link>
           </View>
