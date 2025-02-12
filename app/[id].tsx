@@ -19,14 +19,6 @@ export default function Recetas() {
     const fetchUser = async () => {
       try {
         setLoading(true);
-
-        // Obtener usuario autenticado
-        const { data: dataUser, error: userError } =
-          await supabase.auth.getUser();
-        if (userError || !dataUser.user) return;
-
-        setUserId(dataUser.user.id);
-
         // Obtener receta con su categoría
         const { data: dataRecipe, error: recipeError } = await supabase
           .from('recipes')
@@ -39,7 +31,12 @@ export default function Recetas() {
         } else {
           setRecipe(dataRecipe);
         }
+        // Obtener usuario autenticado
+        const { data: dataUser, error: userError } =
+          await supabase.auth.getUser();
+        if (userError || !dataUser.user) return;
 
+        setUserId(dataUser.user.id);
         // Verificar si la receta está en favoritos
         const { data: dataFavorites, error: favoriteError } = await supabase
           .from('favorites')
@@ -52,8 +49,6 @@ export default function Recetas() {
         } else if (dataFavorites?.length > 0) {
           setIsFavorite(true);
         }
-
-        console.log('Favoritos:', dataFavorites);
       } catch (error) {
         console.error('Error en fetchUser:', error);
       } finally {
@@ -75,7 +70,6 @@ export default function Recetas() {
 
   const handleFavorite = async () => {
     setIsFavorite(!isFavorite);
-    console.log('press Favorite');
     if (!userId) {
       router.replace('/Perfil'); // Redirigir al login si no hay usuario
       return;
