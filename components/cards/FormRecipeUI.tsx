@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import Spinner from 'react-native-loading-spinner-overlay';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface RecipeFormUIProps {
   title: string;
@@ -48,8 +49,12 @@ const RecipeFormUI: React.FC<RecipeFormUIProps> = ({
   imageUpload,
   loading,
 }) => {
+  const insets = useSafeAreaInsets();
   return (
-    <View className="flex-1 justify-center items-center p-4 bg-gray-100">
+    <View
+      style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}
+      className="flex-1 justify-center items-center p-4 bg-gray-800"
+    >
       <ScrollView>
         <Text className="text-2xl font-bold text-gray-800 mb-6">
           Crear Receta
@@ -59,28 +64,31 @@ const RecipeFormUI: React.FC<RecipeFormUIProps> = ({
           value={title}
           onChangeText={setTitle}
           placeholder="Título"
-          className="w-full p-3 mb-4 border rounded-lg bg-white text-gray-700"
+          className="w-max p-3 mb-4 border rounded-lg bg-white text-gray-700"
         />
         <Text>Descripción</Text>
         <TextInput
           value={description}
           onChangeText={setDescription}
           placeholder="Descripción"
-          className="w-full p-3 mb-4 border rounded-lg bg-white text-gray-700"
+          className="w-max p-3 mb-4 border rounded-lg bg-white text-gray-700"
+          multiline={true}
         />
         <Text>Ingredientes</Text>
         <TextInput
           value={ingredients}
           onChangeText={setIngredients}
           placeholder="Ingredientes"
-          className="w-full p-3 mb-4 border rounded-lg bg-white text-gray-700"
+          className="w-max p-3 mb-4 border rounded-lg bg-white text-gray-700"
+          multiline={true}
         />
         <Text>Instrucciones</Text>
         <TextInput
           value={instructions}
           onChangeText={setInstructions}
           placeholder="Instrucciones"
-          className="w-full p-3 mb-4 border rounded-lg bg-white text-gray-700"
+          className="w-max p-3 mb-4 border rounded-lg bg-white text-gray-700"
+          multiline={true}
         />
         <Text className="mb-2 text-gray-700">Selecciona una categoría:</Text>
         {categories.length === 0 ? (
@@ -125,7 +133,7 @@ const RecipeFormUI: React.FC<RecipeFormUIProps> = ({
           className="bg-gray-500 w-36 h-16 text-white rounded-full transition-opacity active:opacity-50 px-4 py-2 m-2 text-center items-center justify-center"
           onPress={handleSubmit}
         >
-          <Text className="text-white ">Crear Receta</Text>
+          <Text className="text-white ">{'Crear Receta'}</Text>
         </Pressable>
 
         {imageUpload && (

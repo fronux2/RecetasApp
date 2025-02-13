@@ -4,10 +4,11 @@ import { Alert } from 'react-native';
 import { type Recipe } from '../../types/models';
 import { pickImage, takePhoto } from '../../utils/imageUtils';
 import { uploadRecipeImage } from '../../services/uploadImage';
-import { addRecipe } from '../../services/recipeService';
+import { addRecipe, updateRecipe } from '../../services/recipeService';
 import RecipeFormUI from '../../components/cards/FormRecipeUI';
 import { Session, AuthChangeEvent } from '@supabase/supabase-js';
 import { supabase } from '../../supabase/supabaseCliente';
+import { router } from 'expo-router';
 
 export default function FormRecipe({ id }: { id: string | undefined }) {
   const [title, setTitle] = useState<string>('');
@@ -25,18 +26,13 @@ export default function FormRecipe({ id }: { id: string | undefined }) {
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    console.log(id + '  pipipipipipipipipi2');
     try {
-      console.log(id + '  pipipipipipipipipi');
       if (id) {
-        console.log(id + '  pipipipipipipipipi');
         const fetchRecipes = async () => {
           const { data, error } = await supabase
             .from('recipes')
             .select('*')
             .eq('id', id);
-
-          console.log(data);
           if (!error) {
             setTitle(data[0].title);
             setDescription(data[0].description);
@@ -100,18 +96,23 @@ export default function FormRecipe({ id }: { id: string | undefined }) {
     }
 
     setLoading(true);
-    const uploadResponse = await uploadRecipeImage(
-      imageUpload.base64,
-      imageUpload.imageName
-    );
-
-    if (!uploadResponse) {
-      return Alert.alert(
-        'Error',
-        'No se pudo subir la imagen, Selecciona otra imagen.'
+    let imageUrl: string;
+    if (!id) {
+      const uploadResponse = await uploadRecipeImage(
+        imageUpload.base64,
+        imageUpload.imageName
       );
-    }
 
+      if (!uploadResponse) {
+        return Alert.alert(
+          'Error',
+          'No se pudo subir la imagen, Selecciona otra imagen.'
+        );
+      }
+      imageUrl = uploadResponse;
+    } else {
+      imageUrl = imageUpload.uri;
+    }
     try {
       const recipe: Recipe = {
         user_id: user.id,
@@ -119,12 +120,18 @@ export default function FormRecipe({ id }: { id: string | undefined }) {
         description,
         ingredients,
         instructions,
-        image_url: uploadResponse,
+        image_url: imageUrl,
         category_id: categoryId,
       };
-      await addRecipe(recipe);
+      console.log('recipe: ' + recipe);
+
+      if (id) await updateRecipe(id, recipe);
+      else {
+        await addRecipe(recipe);
+      }
 
       Alert.alert('Éxito', 'Receta creada con éxito');
+      router.back();
       setImageUpload({ base64: '', imageName: '', uri: '' });
       setTitle('');
       setDescription('');

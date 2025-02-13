@@ -1,11 +1,20 @@
 import { useLocalSearchParams } from 'expo-router';
-import { Text, View, Image, ActivityIndicator, Pressable } from 'react-native';
+import {
+  Text,
+  View,
+  Image,
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+} from 'react-native';
 import { supabase } from '../supabase/supabaseCliente';
 import { Recipe } from '../types/models';
 import { useEffect, useState } from 'react';
 import { recipes } from '../data/recipe';
 import { FavoriteIcon } from '../utils/iconsUtils';
 import { router } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 export default function Recetas() {
   const { id } = useLocalSearchParams();
   const [recipe, setRecipe] = useState<Recipe | null>(null);
@@ -15,6 +24,8 @@ export default function Recetas() {
   const filter = recipes.filter((recipe) => recipe.id === id);
   const recipeFiltered = filter[0];
   const [userId, setUserId] = useState<string | null>(null);
+  const insets = useSafeAreaInsets();
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -110,45 +121,49 @@ export default function Recetas() {
       </View>
     );
   }
+
   return (
-    <View className="flex-1 bg-gray-100 p-4">
-      <Pressable
-        className="flex flex-row-reverse w-full h-16  mr-auto"
-        onPress={handleFavorite}
-      >
-        <View className="flex items-center justify-center">
-          <Text className="text-2xl font-bold text-gray-800 mr-auto">
-            {isFavorite ? 'Favorito' : 'No Favorito'}
+    <View className="flex-1 m-2 p-2">
+      <ScrollView className="">
+        <Pressable
+          className="flex flex-row-reverse w-full h-16  mr-auto mt-4"
+          onPress={handleFavorite}
+        >
+          <View className="flex items-center justify-center">
+            <Text className="text-2xl font-bold text-gray-800 mr-auto">
+              {isFavorite ? 'Favorito' : 'No Favorito'}
+            </Text>
+            <FavoriteIcon color={isFavorite ? '#FF3B3F' : '#666'} />
+          </View>
+        </Pressable>
+
+        <View className="items-center mb-6">
+          <Image
+            source={{ uri: recipe?.image_url }}
+            className="w-48 h-48 rounded-lg"
+          />
+          <Text className="text-2xl font-bold text-gray-800 mt-4">
+            {recipe?.title}
           </Text>
-          <FavoriteIcon color={isFavorite ? '#FF3B3F' : '#666'} />
         </View>
-      </Pressable>
 
-      <View className="items-center mb-6">
-        <Image
-          source={{ uri: recipe?.image_url }}
-          className="w-48 h-48 rounded-lg"
-        />
-        <Text className="text-2xl font-bold text-gray-800 mt-4">
-          {recipe?.title}
-        </Text>
-      </View>
-
-      <View className="space-y-4">
-        <Text className="text-2xl ">{recipe.title}</Text>
-        <Text className="text-lg text-gray-700">{recipe?.description}</Text>
-        <Text className="text-base text-gray-600">
-          <Text className="font-bold">Ingredientes:</Text> {recipe?.ingredients}
-        </Text>
-        <Text className="text-base text-gray-600">
-          <Text className="font-bold">Instrucciones:</Text>{' '}
-          {recipe?.instructions}
-        </Text>
-        <Text className="text-base text-gray-600">
-          <Text className="font-bold">Categoría:</Text>{' '}
-          {recipe?.categories?.name || 'Sin categoría'}
-        </Text>
-      </View>
+        <View className="space-y-4">
+          <Text className="text-2xl ">{recipe.title}</Text>
+          <Text className="text-lg text-gray-700">{recipe?.description}</Text>
+          <Text className="text-base text-gray-600">
+            <Text className="font-bold">Ingredientes:</Text>{' '}
+            {recipe?.ingredients}
+          </Text>
+          <Text className="text-base text-gray-600">
+            <Text className="font-bold">Instrucciones:</Text>{' '}
+            {recipe?.instructions}
+          </Text>
+          <Text className="text-base text-gray-600">
+            <Text className="font-bold">Categoría:</Text>{' '}
+            {recipe?.categories?.name || 'Sin categoría'}
+          </Text>
+        </View>
+      </ScrollView>
     </View>
   );
 }
