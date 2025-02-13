@@ -131,7 +131,7 @@ export default function FormRecipe({ id }: { id: string | undefined }) {
       }
 
       Alert.alert('Éxito', 'Receta creada con éxito');
-      router.back();
+      router.navigate('/RecepieList');
       setImageUpload({ base64: '', imageName: '', uri: '' });
       setTitle('');
       setDescription('');

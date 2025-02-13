@@ -53,7 +53,7 @@ const RecipeFormUI: React.FC<RecipeFormUIProps> = ({
   return (
     <View
       style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}
-      className="flex-1 justify-center items-center p-4 bg-gray-800"
+      className="flex-1 justify-center items-center p-4 bg-gray-100"
     >
       <ScrollView>
         <Text className="text-2xl font-bold text-gray-800 mb-6">
