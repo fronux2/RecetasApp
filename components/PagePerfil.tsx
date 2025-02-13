@@ -127,12 +127,17 @@ const PagePerfil = () => {
                     </Pressable>
                   </Link>
                   <View className="flex-row">
-                    <Pressable
-                      onPress={() => handleEdit(item.id)}
-                      className="bg-blue-500 px-2 py-1 rounded"
+                    <Link
+                      href={{
+                        pathname: '/form',
+                        params: { id: item.id },
+                      }}
+                      asChild
                     >
-                      <Text className="text-white font-semibold">Editar</Text>
-                    </Pressable>
+                      <Pressable className="bg-blue-500 px-2 py-1 rounded">
+                        <Text className="text-white font-semibold">Editar</Text>
+                      </Pressable>
+                    </Link>
                     <Pressable
                       onPress={() => handleDelete(item.id)}
                       className="bg-red-500 px-2 py-1 rounded"
