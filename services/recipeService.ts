@@ -33,8 +33,9 @@ export const updateRecipe = async (
   id: string,
   recipe: Recipe
 ): Promise<void> => {
+  console.log('id: ' + id);
+  console.log('recipe: ' + recipe);
   const { error } = await supabase.from('recipes').update(recipe).eq('id', id);
-
   if (error) {
     console.error(error);
   }

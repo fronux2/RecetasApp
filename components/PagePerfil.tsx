@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, Button, FlatList, Pressable } from 'react-native';
+import { View, Text, Button, FlatList, Pressable, Alert } from 'react-native';
 import { supabase } from '../supabase/supabaseCliente';
 import { Recipe } from '../types/models';
 import LoginForm from '../components/auth/LoginForm';
@@ -7,11 +7,14 @@ import { Link } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { logout } from '../services/authService';
 import { deleteRecipe } from '../services/recipeService';
+import Modal from 'react-native-modal';
+
 const PagePerfil = () => {
   const [user, setUser] = useState<any>(null);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [handleModalResponse, setHandleModalResponse] = useState(false);
   // Actualizar usuario al iniciar o cerrar sesión
   useEffect(() => {
     const fetchUser = async () => {
@@ -66,22 +69,52 @@ const PagePerfil = () => {
     setRecipes([]);
   };
 
-  const handleDelete = async (id: string) => {
-    try {
-      await deleteRecipe(id);
-      setRecipes((prevRecipes) =>
-        prevRecipes.filter((recipe) => recipe.id !== id)
-      );
-    } catch (error) {
-      console.log(error);
+  const handleDelete = async (id: string, confirmado: boolean) => {
+    setModalVisible(true); // Muestra el modal
+    console.log('handleDelete');
+    if (isModalVisible) {
+      console.log('isModalVisible');
+      setModalVisible(false);
     }
   };
 
   const handleEdit = async (id: string) => {
     console.log('handleEdit');
   };
+
+  const showModal = () => {
+    setModalVisible(true);
+  };
+
+  const hideModal = () => {
+    setModalVisible(false);
+  };
+
   return (
     <View className="flex-1 p-4 bg-gray-100">
+      <Modal isVisible={isModalVisible} onBackdropPress={hideModal}>
+        <View className="bg-white p-6 rounded-lg">
+          <Text className="text-lg font-bold mb-4">
+            ¿Estás seguro de que quieres borrar esto?
+          </Text>
+          <View className="flex-row justify-end">
+            {/* Botón "No" */}
+            <Pressable
+              onPress={() => setHandleModalResponse(false)} // Devuelve false
+              className="bg-gray-300 transition-opacity active:opacity-50 px-4 py-2 rounded-lg mr-2"
+            >
+              <Text className="text-gray-800 font-bold">No</Text>
+            </Pressable>
+            {/* Botón "Sí" */}
+            <Pressable
+              onPress={() => setHandleModalResponse(true)} // Devuelve true
+              className="bg-red-500 transition-opacity active:opacity-50 px-4 py-2 rounded-lg"
+            >
+              <Text className="text-white font-bold">Sí</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
       <Text className="text-2xl font-bold text-gray-800 mb-4">Perfil</Text>
 
       {user ? (
@@ -112,7 +145,7 @@ const PagePerfil = () => {
                         <Text className="text-lg font-semibold text-gray-800">
                           {item.title}
                         </Text>
-                        <Text className="text-sm text-gray-600">
+                        <Text className="text-sm text-gray-600 w-64">
                           {item.description}
                         </Text>
                       </View>
