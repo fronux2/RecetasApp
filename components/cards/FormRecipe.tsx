@@ -1,10 +1,15 @@
 // RecipeForm.tsx
 import { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
-import { type Recipe } from '../../types/models';
+import { type Recipe, Category } from '../../types/models';
 import { pickImage, takePhoto } from '../../utils/imageUtils';
 import { uploadRecipeImage } from '../../services/uploadImage';
-import { addRecipe, updateRecipe } from '../../services/recipeService';
+import {
+  addRecipe,
+  updateRecipe,
+  fetchRecipesId,
+  fetchCategories,
+} from '../../services/recipeService';
 import RecipeFormUI from '../../components/cards/FormRecipeUI';
 import { Session, AuthChangeEvent } from '@supabase/supabase-js';
 import { supabase } from '../../supabase/supabaseCliente';
@@ -22,18 +27,17 @@ export default function FormRecipe({ id }: { id: string | undefined }) {
     imageName: string;
     uri: string;
   }>({ base64: '', imageName: '', uri: '' });
-  const [categories, setCategories] = useState<{ id: string }[]>([]);
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>(
+    []
+  );
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
     try {
       if (id) {
         const fetchRecipes = async () => {
-          const { data, error } = await supabase
-            .from('recipes')
-            .select('*')
-            .eq('id', id);
-          if (!error) {
+          const data = await fetchRecipesId(id);
+          if (data) {
             setTitle(data[0].title);
             setDescription(data[0].description);
             setIngredients(data[0].ingredients);
@@ -57,13 +61,12 @@ export default function FormRecipe({ id }: { id: string | undefined }) {
         data: { user },
       } = await supabase.auth.getUser();
       setUser(user);
-      const { data, error } = await supabase
-        .from('categories')
-        .select('id, name');
-      if (error) {
-        console.error('Error al obtener categorías:', error.message);
-      } else {
+      try {
+        const data: Category[] = await fetchCategories();
         setCategories(data);
+        console.log('categories!!! ' + data);
+      } catch (error) {
+        console.error('Error al obtener categorías: ', error);
       }
     };
     fetchUserAndCategories();

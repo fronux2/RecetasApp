@@ -6,7 +6,7 @@ import LoginForm from '../components/auth/LoginForm';
 import { Link } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { logout } from '../services/authService';
-import { deleteRecipe } from '../services/recipeService';
+import { deleteRecipe, fetchUserRecipes } from '../services/recipeService';
 const PagePerfil = () => {
   const [user, setUser] = useState<any>(null);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -39,15 +39,13 @@ const PagePerfil = () => {
     useCallback(() => {
       const fetchRecipes = async () => {
         setLoading(true);
-        const { data, error } = await supabase
-          .from('recipes')
-          .select('*')
-          .eq('user_id', user.id);
-
-        if (!error) {
+        try {
+          const data = await fetchUserRecipes(user.id);
           setRecipes(data || []);
+          setLoading(false);
+        } catch (error) {
+          console.error('Error al cargar las recetas:', error);
         }
-        setLoading(false);
       };
 
       if (user) {
@@ -78,16 +76,12 @@ const PagePerfil = () => {
   };
 
   const handleDelete2 = async (id: string) => {
-    console.log('handleDelete2');
     await deleteRecipe(id);
     setRecipes((prevRecipes) =>
       prevRecipes.filter((recipe) => recipe.id !== id)
     );
   };
 
-  const handleEdit = async (id: string) => {
-    console.log('handleEdit');
-  };
   return (
     <View className="flex-1 p-4 bg-gray-100">
       <Text className="text-2xl font-bold text-gray-800 mb-4">Perfil</Text>
@@ -107,7 +101,7 @@ const PagePerfil = () => {
           ) : recipes.length > 0 ? (
             <FlatList
               data={recipes}
-              keyExtractor={(item: Recipe) => item.id.toString()}
+              keyExtractor={(item: Recipe) => item.id!.toString()}
               renderItem={({ item }) => (
                 <View className="p-4 bg-gray-100 mb-2 rounded-lg shadow flex-row justify-between">
                   <Link
@@ -139,7 +133,7 @@ const PagePerfil = () => {
                       </Pressable>
                     </Link>
                     <Pressable
-                      onPress={() => handleDelete(item.id)}
+                      onPress={() => handleDelete(item.id!)}
                       className="bg-red-500 px-2 py-1 rounded"
                     >
                       <Text className="text-white font-semibold">Borrar</Text>

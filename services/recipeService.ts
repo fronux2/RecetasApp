@@ -1,6 +1,6 @@
 // src/services/supabaseService.ts
 import { supabase } from '../supabase/supabaseCliente';
-import { Recipe } from '../types/models';
+import { Recipe, Category } from '../types/models';
 export const fetchRecipes = async (): Promise<Recipe[]> => {
   const { data, error } = await supabase.from('recipes').select('*');
 
@@ -11,7 +11,19 @@ export const fetchRecipes = async (): Promise<Recipe[]> => {
 
   return data as Recipe[];
 };
+export const fetchRecipesId = async (id: string): Promise<Recipe[]> => {
+  const { data, error } = await supabase
+    .from('recipes')
+    .select('*')
+    .eq('id', id);
 
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  return (data as Recipe[]) || error;
+};
 export const addRecipe = async (recipe: Recipe): Promise<void> => {
   const { error } = await supabase.from('recipes').insert([recipe]);
 
@@ -33,10 +45,31 @@ export const updateRecipe = async (
   id: string,
   recipe: Recipe
 ): Promise<void> => {
-  console.log('id: ' + id);
-  console.log('recipe: ' + recipe);
   const { error } = await supabase.from('recipes').update(recipe).eq('id', id);
   if (error) {
     console.error(error);
   }
+};
+
+export const fetchCategories = async (): Promise<Category[]> => {
+  const { data, error } = await supabase.from('categories').select('id, name');
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  return data as Category[];
+};
+
+export const fetchUserRecipes = async (id: string): Promise<Recipe[]> => {
+  const { data, error } = await supabase
+    .from('recipes')
+    .select('*')
+    .eq('user_id', id);
+  if (error) {
+    console.error(error);
+    return [];
+  }
+  return data as Recipe[];
 };
